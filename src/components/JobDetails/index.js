@@ -8,33 +8,39 @@ import {FiExternalLink} from 'react-icons/fi'
 
 import Header from '../Header'
 import Failure from '../Failure'
+import SimilarJobItem from '../SimilarJobItem'
 
 class JobDetails extends Component {
-  state = {jobDetails: {}, similarJobs: [], failedFetch: false}
+  state = {jobDetails: {}, skills: [], similarJobs: [], failedFetch: false}
 
   componentDidMount() {
     this.loadData()
   }
 
-  getCamelCaseJobDetails = data => ({
-    companyLogoUrl: data.company_logo_url,
-    companyWebsiteUrl: data.company_website_url,
-    employmentType: data.employment_type,
-    id: data.id,
-    jobDescription: data.job_description,
-    lifeAtCompany: {
-      description: data.life_at_company.description,
-      imageUrl: data.life_at_company.image_url,
-    },
-    location: data.location,
-    packagePerAnnum: data.package_per_annum,
-    rating: data.rating,
-    skills: data.skills.map(skill => ({
+  getCamelCaseJobDetails = data => {
+    const {skills} = data
+    const camelCaseSkills = skills.map(skill => ({
       name: skill.name,
       imageUrl: skill.image_url,
-    })),
-    title: data.title,
-  })
+    }))
+    return [
+      {
+        companyLogoUrl: data.company_logo_url,
+        companyWebsiteUrl: data.company_website_url,
+        employmentType: data.employment_type,
+        id: data.id,
+        jobDescription: data.job_description,
+        lifeAtCompanyDescription: data.life_at_company.description,
+        lifeAtCompanyImageUrl: data.life_at_company.image_url,
+        location: data.location,
+        packagePerAnnum: data.package_per_annum,
+        rating: data.rating,
+        skills: camelCaseSkills,
+        title: data.title,
+      },
+      camelCaseSkills,
+    ]
+  }
 
   getCamelCaseSimilarJobDetails = data => ({
     companyLogoUrl: data.company_logo_url,
@@ -47,13 +53,16 @@ class JobDetails extends Component {
   })
 
   onSuccessfulFetch = (jobDetails, similarJobs) => {
-    const camelCaseJobDetails = this.getCamelCaseJobDetails(jobDetails)
+    const [camelCaseJobDetails, skills] = this.getCamelCaseJobDetails(
+      jobDetails,
+    )
     const camelCaseSimilarJobs = similarJobs.map(similarJob =>
       this.getCamelCaseSimilarJobDetails(similarJob),
     )
     this.setState({
       jobDetails: camelCaseJobDetails,
       similarJobs: camelCaseSimilarJobs,
+      skills,
     })
   }
 
@@ -87,22 +96,30 @@ class JobDetails extends Component {
     this.setState({failedFetch: false}, this.loadData)
   }
 
+  skillItem = skill => {
+    const {name, imageUrl} = skill
+    return (
+      <li className="skill-item" key={name}>
+        <img className="skill-logo" src={imageUrl} alt={name} />
+        <p className="skill-name">{name}</p>
+      </li>
+    )
+  }
+
   renderJobDetails = () => {
-    const {jobDetails} = this.state
+    const {jobDetails, skills} = this.state
     const {
       companyLogoUrl,
       companyWebsiteUrl,
       employmentType,
       jobDescription,
-      lifeAtCompany,
+      lifeAtCompanyDescription,
+      lifeAtCompanyImageUrl,
       location,
       packagePerAnnum,
       rating,
-      skills,
       title,
     } = jobDetails
-
-    for (const skill of skills) console.log(skill)
 
     return (
       <div className="job-details-main-container">
@@ -148,22 +165,41 @@ class JobDetails extends Component {
         </div>
         <p className="job-description">{jobDescription}</p>
         <h1 className="heading">Skills</h1>
-        <div className="skills-container">
-          prem
-          {/* skills.map(skill => {
-            const {name, imageUrl} = skill
-            return (
-              <div className="skill-item">
-                <img src={imageUrl} alt={name} />
-                <p>{name}</p>
-              </div>
-            )
-          })
-          */}
+        <ul className="skills-container">
+          {skills.map(skill => this.skillItem(skill))}
+        </ul>
+        <h1 className="heading">Life at Company</h1>
+        <div className="life-at-company-container">
+          <p className="life-at-company-description">
+            {lifeAtCompanyDescription}
+          </p>
+          <img
+            className="life-at-company-image"
+            src={lifeAtCompanyImageUrl}
+            alt="life at company"
+          />
         </div>
       </div>
     )
   }
+
+  renderSimilarJobs = () => {
+    const {similarJobs} = this.state
+    return (
+      <ul className="similar-job-items-container">
+        {similarJobs.map(similarJob => (
+          <SimilarJobItem similarJob={similarJob} key={similarJob.id} />
+        ))}
+      </ul>
+    )
+  }
+
+  renderJobs = () => (
+    <>
+      {this.renderJobDetails()}
+      {this.renderSimilarJobs()}
+    </>
+  )
 
   render() {
     const {failedFetch} = this.state
@@ -174,7 +210,7 @@ class JobDetails extends Component {
           {failedFetch ? (
             <Failure onClickRetryButton={this.onClickRetryButton} />
           ) : (
-            this.renderJobDetails()
+            this.renderJobs()
           )}
         </div>
       </>
