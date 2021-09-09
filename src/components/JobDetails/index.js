@@ -5,13 +5,21 @@ import Cookies from 'js-cookie'
 import {BsFillStarFill, BsFillBriefcaseFill} from 'react-icons/bs'
 import {MdLocationOn} from 'react-icons/md'
 import {FiExternalLink} from 'react-icons/fi'
+import Loader from 'react-loader-spinner'
+import 'react-loader-spinner/dist/loader/ThreeDots'
 
 import Header from '../Header'
 import Failure from '../Failure'
 import SimilarJobItem from '../SimilarJobItem'
 
 class JobDetails extends Component {
-  state = {jobDetails: {}, skills: [], similarJobs: [], failedFetch: false}
+  state = {
+    jobDetails: {},
+    skills: [],
+    similarJobs: [],
+    failedFetch: false,
+    isLoading: true,
+  }
 
   componentDidMount() {
     this.loadData()
@@ -63,11 +71,12 @@ class JobDetails extends Component {
       jobDetails: camelCaseJobDetails,
       similarJobs: camelCaseSimilarJobs,
       skills,
+      isLoading: false,
     })
   }
 
   onFetchFailure = () => {
-    this.setState({failedFetch: true})
+    this.setState({failedFetch: true, isLoading: false})
   }
 
   loadData = async () => {
@@ -93,7 +102,7 @@ class JobDetails extends Component {
   }
 
   onClickRetryButton = () => {
-    this.setState({failedFetch: false}, this.loadData)
+    this.setState({failedFetch: false, isLoading: true}, this.loadData)
   }
 
   skillItem = skill => {
@@ -186,11 +195,14 @@ class JobDetails extends Component {
   renderSimilarJobs = () => {
     const {similarJobs} = this.state
     return (
-      <ul className="similar-job-items-container">
-        {similarJobs.map(similarJob => (
-          <SimilarJobItem similarJob={similarJob} key={similarJob.id} />
-        ))}
-      </ul>
+      <>
+        <h1 className="heading">Similar Jobs</h1>
+        <ul className="similar-job-items-container">
+          {similarJobs.map(similarJob => (
+            <SimilarJobItem similarJob={similarJob} key={similarJob.id} />
+          ))}
+        </ul>
+      </>
     )
   }
 
@@ -201,18 +213,26 @@ class JobDetails extends Component {
     </>
   )
 
+  renderLoader = () => (
+    <div className="loader-container" testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
+    </div>
+  )
+
   render() {
-    const {failedFetch} = this.state
+    const {failedFetch, isLoading} = this.state
     return (
       <>
         <Header />
         <div className="job-details-background-container">
-          {failedFetch ? (
+          {isLoading && this.renderLoader()}
+          {!isLoading && failedFetch ? (
             <Failure onClickRetryButton={this.onClickRetryButton} />
           ) : (
             this.renderJobs()
           )}
         </div>
+        )
       </>
     )
   }

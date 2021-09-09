@@ -26,7 +26,7 @@ const Sidebar = props => {
       <Profile />
       <hr />
       <div className="column-container">
-        <h1 className="checkbox-container-heading">Types of Employment</h1>
+        <h1 className="checkbox-container-heading">Type of Employment</h1>
         <ul className="options-container">
           {employmentTypesList.map(employmentType => {
             const {label, employmentTypeId} = employmentType

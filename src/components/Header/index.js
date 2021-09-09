@@ -32,17 +32,23 @@ const Header = props => {
       <button className="logout-button" type="button" onClick={logoutFromPage}>
         Logout
       </button>
-      <div className="small-device-links-container">
-        <Link className="link-icons" to="/">
-          <AiFillHome size={24} />
-        </Link>
-        <Link className="link-icons" to="/jobs">
-          <BsFillBriefcaseFill size={24} />
-        </Link>
-        <button className="link-icons" type="button" onClick={logoutFromPage}>
-          <FiLogOut size={24} />
-        </button>
-      </div>
+      <ul className="small-device-links-container">
+        <li>
+          <Link className="link-icons" to="/">
+            <AiFillHome size={24} />
+          </Link>
+        </li>
+        <li>
+          <Link className="link-icons" to="/jobs">
+            <BsFillBriefcaseFill size={24} />
+          </Link>
+        </li>
+        <li>
+          <button className="link-icons" type="button" onClick={logoutFromPage}>
+            <FiLogOut size={24} />
+          </button>
+        </li>
+      </ul>
     </div>
   )
 }

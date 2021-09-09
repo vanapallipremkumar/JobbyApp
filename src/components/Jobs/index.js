@@ -145,7 +145,7 @@ class Jobs extends Component {
       />
       <h1 className="no-jobs-title">No Jobs Found</h1>
       <p className="no-jobs-description">
-        We could not find any jobs. Try other files.
+        We could not find any jobs. Try other filters
       </p>
     </div>
   )
@@ -185,7 +185,7 @@ class Jobs extends Component {
   }
 
   onClickRetryButton = () => {
-    this.setState({isLoading: true, failedFetch: false})
+    this.setState({isLoading: true, failedFetch: false}, this.loadData)
   }
 
   render() {
